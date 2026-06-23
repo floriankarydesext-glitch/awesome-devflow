@@ -43,9 +43,9 @@ Launch safely, enable users and teams, and ensure smooth operations.
 
 #### Documentation
 
-#### Release
+#### Deployment
 
-#### Operate & Support
+#### Ops & Support
 
 ## Tools & Practices
 
@@ -114,7 +114,7 @@ Features are used to introduce new changes in the development branch as part of 
 - _Develop & review the feature._
 - Merge `feature/<jira-ticket>` branch into sub-repo(s) `develop`.
 - Update sub-repo(s) reference(s) in meta-repo `develop` to target the merge commit on sub-repo(s) `develop`.
-- Commit changes to meta-repo `develop` with message `"chore: merge feature <jira-ticket>"`.
+- Commit changes to meta-repo `develop` with message `"chore(<jira-ticket>): merge feature"`.
 
 ###### Release
 
@@ -126,9 +126,9 @@ In a multi-repo setup, making a release means releasing any changes in the sub-r
 - Create `release/<sub-version>` branch from `develop` for each sub-repo with changes.
 - Bump the version, if any, in all created `release/*` branches.
 - Update sub-repo reference(s) to the last commit, if any, on sub-repo `release/<sub-version>`.
-- Commit changes to the meta-repo `release/<meta-version>` with the message `"chore: merge candidate <meta-version>"` and tag `v<meta-version>-rc.1`.
+- Commit changes to the meta-repo `release/<meta-version>` with the message `"chore(<jira-ticket>): merge candidate <meta-version>"` and tag `v<meta-version>-rc.1`.
 - _Validate the release with the QA full test suite._ If not approved, do bug fixes.
-- Edit the release notes. <!-- TODO: Checkout how to document release in Jira+Bitbucket. -->
+- Edit the release notes.
 - Merge sub-repo `release/<sub-version>` into `main` (ff-only) and tag with `v<sub-version>`.
 - Merge newly released sub-repos `main` back into `develop`. <!-- No commit required with ff-only: - Update sub-repo reference(s) to the last release tag on sub-repo `main`. - Commit changes to the meta-repo `release/<meta-version>` with the message `"chore: release <meta-version>"` -->
 - Merge `release/<meta-version>` into `main` (ff-only) and tag with `v<meta-version>`.
@@ -143,7 +143,7 @@ Bug fixes are used to fix bugs against a release branch. The process is the same
 - Merge the `bugfix/<jira-ticket>` branch into sub-repo(s) `release/<sub-version>`.
 - Merge the `bugfix/<jira-ticket>` branch into sub-repo(s) `develop`.
 - Update sub-repo(s) reference(s) to the last commit (if any) on sub-repo(s) `release/<sub-version>`.
-- Commit changes to meta-repo `release/<meta-version>` with the message `"chore: merge bugfix <jira-ticket>"` and tag `v<meta-version>-rc.<rc-number>`.
+- Commit changes to meta-repo `release/<meta-version>` with the message `"chore(<jira-ticket>): merge bugfix"` and tag `v<meta-version>-rc.<rc-number>`.
 
 ###### Hot Fix
 
@@ -154,7 +154,7 @@ Hotfixes are used to quickly fix the production branch. From a Gitflow perspecti
 - _Develop & review the hotfix._
 - Bump the version in all created `hotfix/*` branches.
 - Update sub-repo reference(s) in meta-repo `hotfix/<meta-version>` to target the last commit on sub-repo `hotfix/<sub-version>`.
-- Commit changes to meta-repo `hotfix/<sub-version>` with message `"chore: merge hotfix <meta-version>"` and tag `v<meta-version>-rc.<rc-number>`.
+- Commit changes to meta-repo `hotfix/<sub-version>` with message `"chore(<jira-ticket>): merge hotfix <meta-version>"` and tag `v<meta-version>-rc.<rc-number>`.
 - _Validate the hotfix with the QA limited test suite._ If not approved, do bug fixes.
 - Edit release notes.
 - Merge sub-repo `hotfix/<sub-version>` into `main` (ff-only) and tag with `v<sub-version>`.
@@ -164,18 +164,20 @@ Hotfixes are used to quickly fix the production branch. From a Gitflow perspecti
 
 ###### Support
 
-Support is used to bring fixes to older major releases. It is similar to hotfixes, but it will never get merged back into `main`. Support bumps the patch version.
+Support is used to bring fixes to older major releases. It is essentially creating a new base branch for hotfixes. This new base branch will never get merged back into `main`. Support bumps the patch version.
 
-- Create `support/<meta-major-version>.x` branch from the last tag `v<meta-major-version>.*.*`.
-- Create `support/<meta-major-version>.x` branch from the related `v<sub-major-version>.*.*` for each sub-repo that requires changes.
-- _Develop & review the support patch._
-- Bump the version in all created `support/*` branches.
-- Update sub-repo references in meta-repo `support/<meta-version>` to target the last commit on sub-repo `support/<sub-version>`.
-- Commit changes to meta-repo `support/<sub-version>` with message `"chore: merge support <meta-version>"` and tag `v<meta-version>-rc.<rc-number>`.
-- _Validate the hotfix with the QA limited test suite._ If not approved, do a bug fix.
-- Edit the release notes.
-- Tag each `support/<sub-version>` with `v<sub-version>`.
-- Tag `support/<meta-version>` with `v<meta-version>`.
+- Create `support/<meta-major-version>.x` branch from the last tag `v<meta-major-version>.*.*` (if it does not exists).
+- Create `support/<sub-major-version>.x` branch from the related `v<sub-major-version>.*.*` for each sub-repo that requires changes (if it does not exists).
+- Create `hotfix/<meta-version>` branch from meta-repo `support/<meta-major-version>.x`.
+- Create `hotfix/<sub-version>` branch from `support/<sub-major-version>.x` for each sub-repo with bugs.
+- _Develop & review the hotfix._
+- Bump the version in all created `hotfix/*` branches.
+- Update sub-repo reference(s) in meta-repo `hotfix/<meta-version>` to target the last commit on sub-repo `hotfix/<sub-version>`.
+- Commit changes to meta-repo `hotfix/<sub-version>` with message `"chore(<jira-ticket>): merge hotfix <meta-version>"` and tag `v<meta-version>-rc.<rc-number>`.
+- _Validate the hotfix with the QA limited test suite._ If not approved, do bug fixes.
+- Edit release notes.
+- Merge sub-repo `hotfix/<sub-version>` into `support/<sub-major-version>.x` (ff-only) and tag with `v<sub-version>`.
+- Merge meta-repo `hotfix/<meta-version>` into `support/<meta-major-version>.x` (ff-only) and tag with `v<meta-version>`.
 
 ##### Gitflow Automation
 
@@ -184,6 +186,10 @@ You've probably noticed that Gitflow, unfortunately, involves some overhead, but
 ###### Bitbucket Settings
 
 Bitbucket Server provides several repository settings that help enforce Gitflow discipline across the team. **Branch permissions** (under _Repository Settings → Branch Permissions_) should be configured to protect `main` and `develop`: restrict direct pushes so that all changes must go through a pull request, and require a minimum number of approvals before merging. **Branch name patterns** can be enforced to ensure developers follow the `feature/*`, `release/*`, `bugfix/*`, `hotfix/*`, and `support/*` naming conventions, rejecting branches that do not match. **Merge checks** can be enabled to require successful builds and passing tests (reported via the build status API from your CI tool) before a pull request can be merged. Finally, **default reviewers** can be assigned per branch pattern, automatically adding the relevant team members as reviewers on pull requests targeting `develop` or `main`, ensuring nothing is merged without appropriate oversight.
+
+###### Cocogitto Toolbox
+
+The [Cocogitto](https://docs.cocogitto.io/) Conventional Commits toolbox can be used to create conventional compliant commits with ease, automatically bump versions and generate changelogs with your own custom steps and workflows.
 
 ###### Feature Merge Hook
 
@@ -224,6 +230,27 @@ With sub-repos as Git submodules:
 
 <!-- TODO: List general practice (e.g. branch naming, commit messages, merge strategy, history-rewrite, branch deletion, stale branch policy) -->
 
+##### Branches & Tags
+
+- Branch names are all lowercase and spaces get sanitized as dash (e.g. `FLS-2345 Create my Feature` -> `feature/fls-2345-create-my-feature`).
+- `feature/*` and `bugfix/*` branches start with the Jira ticket number (e.g. `feature/fls-2345-create-my-feature`).
+- `release/*`, `hotfix/*` and `support/*` branches match the target version number (e.g. `release/2.3.0`, `hotfix/2.3.1`, `support/1.5.12`).
+- Version tags always start with `v` (e.g. `v2.3.1`).
+- Release candidates (RC) sent for QA validation are tagged with target version number and the RC iteration prefixed with `-rc.` (e.g. `v2.3.1-rc.2` after a first bug fix).
+
+##### Commits
+
+- Commit messages follow the [Conventional Commits 1.0.0](https://www.conventionalcommits.org/en/v1.0.0/) specification with scope set to the 
+
+##### Merges
+
+- All branche merges must go through a pull request.
+- ...
+
+##### Housekeeping
+
+- ...
+
 #### Code Owners
 
 #### Why ?
@@ -257,7 +284,9 @@ Bitbucket allows us to define code owners for any path directly in the repositor
 
 #### Pull Request
 
-**⚠️ All code changes should be covered by a PR.**
+> This only cover pull requests to be submitted for code review. For pull request created for QA testing as part of the release process, see []().
+
+⚠️ All code changes to be merged from a should be covered by a PR.
 
 ##### Prerequisites
 
@@ -338,21 +367,19 @@ Slashed build time by 50% 🔥
 11. Code owner approves the PR (2/2 ✅).
 12. Author merges the PR 🚀
 
-#### Release Creation
+#### Releases
 
-##### Release Notes Templates
+<!-- TODO: Checkout how to document release in Jira+Bitbucket. -->
 
-##### FLS Soft
+##### Release Schedule
 
-> **ToDo**
->
-> Explain how to create a new FLS IHM release candidate for QA.
+##### Release Flow
 
-##### FLS IHM
+##### Release Ticket Template
 
-> **ToDo**
->
-> Explain how to create a new FLS IHM release candidate for QA.
+##### Release Notes Template
+
+##### Release Request Template
 
 #### Coding Style
 
@@ -406,11 +433,13 @@ pytest and pytest-cov.
 
 Vitest & Playwright.
 
-#### Code Quality Analysis
+#### Static Code Analysis
 
 SonarQube with coverage.
 
-#### CI/CD Pipelines
+### DevOps 👷
+
+#### CI Pipelines
 
 Jenkins.
 
@@ -418,15 +447,19 @@ Jenkins.
 
 Artifactory.
 
-#### Documentation Repository
+#### Documentation Page
 
 Cannot use Bitbucket to publish a static website at the moment; need to discuss.
+
+#### Deployment Strategy
+
+Combination of custom bash script, docker-compose and Ansible. Not quite sure what's actually happening here right now.
 
 ### Test 🧑‍🔬
 
 Try Zephyr for Jira (paid, but low-cost). Have a look at Qase (full-featured tool for QA).
 
-## People
+## People 🧑‍🤝‍🧑
 
 ### Roles
 
