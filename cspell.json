@@ -1,6 +1,8 @@
 {
     "version": "0.2",
     "words": [
+        "ANMF",
+        "Cocogitto",
         "Driessen",
         "Gitflow",
         "hotfixe",
@@ -10,6 +12,7 @@
         "Lifecycles",
         "Penpot",
         "pytest",
-        "Qase"
+        "Qase",
+        "Radečić"
     ]
 }
