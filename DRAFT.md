@@ -443,17 +443,17 @@ At the end of each sprint, each package or app that has changes on the developme
 
 > This focuses on the high-level release flow. For a detailed explanation of how to use Git, see [Gitflow](#gitflow-for-multi-repos-project).
 
-1. Generate the changelogs comparing `develop` and `main`.
+1. Generate the changelogs by comparing `develop` and `main`.
 2. Determine the new version number based on the changes, following semantic versioning.
-3. Create `release/X.Y.Z` branch.
-4. Create the new unreleased version* (e.g. X.Y.Z) in the Jira "Releases" page based on the list of changes to be released and following semantic versioning.
+3. Create a `release/X.Y.Z` branch.
+4. Create the new unreleased version* (e.g., X.Y.Z) in the Jira "Releases" page based on the list of changes to be released and following semantic versioning.
 5. Create a "Release \<Project Name\> X.Y.Z" task in Jira.
-6. Write release notes in task description (see [template](#release-notes-sample)).
+6. Write release notes in the task description (see [template](#release-notes-sample)).
 7. Add the list of all the issues to be released in the task description.
 8. Set "Fix Version/s" to the new release version for this release task and all the Jira issues included in the release.
-9. Bump the version and, update the changelogs with release notes and run any other chores in all created `release/*` branches.
+9. Bump the version and update the changelogs with release notes, and run any other chores in all created `release/*` branches.
 10. Build the release candidate binaries.
-11. Submit PR(s) with release notes for each `release/*` branches into `main` for QA.
+11. Submit PR(s) with release notes for each `release/*` branch into `main` for QA.
 12. If any bugs are reported by QA, apply fixes to `release/*` until QA approval.
 13. Merge the release PR(s) and tag `main` with `vX.Y.Z`.
 14. Update release notes if necessary.
